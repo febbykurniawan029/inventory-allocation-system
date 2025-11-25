@@ -1,0 +1,67 @@
+services:
+  # 1. DATABASE SERVICE
+  db:
+    image: postgres:15-alpine
+    container_name: inventory_db_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: inventory_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - inventory_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. BACKEND SERVICE
+  backend:
+    build: ./backend
+    container_name: inventory_backend_express
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy # Tunggu DB sehat dulu baru jalan
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      # Koneksi Database (Host pakai nama service 'db')
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgrespassword
+      DB_NAME: inventory_db
+      DB_HOST: db 
+      DB_DIALECT: postgres
+      # Vendor Config (Isi sesuai asli/dummy)
+      VENDOR_API_URL: ${VENDOR_API_URL}
+      VENDOR_SECRET_KEY: ${VENDOR_SECRET_KEY}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # 3. FRONTEND SERVICE
+  frontend:
+    build: ./frontend
+    container_name: inventory_frontend_nextjs
+    ports:
+      - "${FRONTEND_PORT:-3001}:3001" # Kita pakai port 3001 untuk Frontend agar tidak bentrok
+    environment:
+      # PENTING: Karena Next.js berjalan di browser (Client Side), 
+      # API URL harus mengarah ke localhost komputer user, BUKAN nama container.
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      WATCHPACK_POLLING: 'true' # Untuk mengatasi masalah file watching di beberapa OS
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    depends_on:
+      - backend
+
+volumes:
+  inventory_postgres_data:

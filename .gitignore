@@ -1,0 +1,15 @@
+# --- Global Ignores ---
+node_modules/
+.DS_Store
+Thumbs.db
+
+# --- Environment Variables Root ---
+.env
+!.env.example
+
+# --- IDE Settings ---
+.vscode/
+.idea/
+
+# --- Docker ---
+docker-compose.override.yml
