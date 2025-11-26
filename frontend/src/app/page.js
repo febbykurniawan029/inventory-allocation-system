@@ -47,101 +47,110 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Table Stocks */}
-      <div className="bg-white p-6 rounded shadow">
+      <div className="bg-white p-4 sm:p-6 rounded shadow overflow-hidden">
         <h2 className="text-xl font-bold mb-4">📊 Stock Levels</h2>
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-100 border-b">
-            <tr>
-              <th className="p-3">Product</th>
-              <th className="p-3">Warehouse</th>
-              <th className="p-3">Qty</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stocks.length === 0 ? (
+        
+        {/* WRAPPER SCROLL HORIZONTAL */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse whitespace-nowrap">
+            <thead className="bg-gray-100 border-b">
               <tr>
-                <td colSpan="3" className="p-4 text-center text-gray-500">
-                  No stock data available.
-                </td>
+                <th className="p-3">Product</th>
+                <th className="p-3">Warehouse</th>
+                <th className="p-3">Qty</th>
               </tr>
-            ) : (
-              stocks.map((s) => (
-                <tr key={s.id} className="border-b hover:bg-gray-50">
-                  <td className="p-3">
-                    {s.product?.name}{" "}
-                    <span className="text-gray-400 text-sm">
-                      ({s.product?.sku})
-                    </span>
+            </thead>
+            <tbody>
+              {stocks.length === 0 ? (
+                <tr>
+                  <td colSpan="3" className="p-4 text-center text-gray-500">
+                    No stock data available.
                   </td>
-                  <td className="p-3">{s.warehouse?.name}</td>
-                  <td className="p-3 font-bold text-blue-600">{s.quantity}</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                stocks.map((s) => (
+                  <tr key={s.id} className="border-b hover:bg-gray-50">
+                    <td className="p-3">
+                      {s.product?.name}{" "}
+                      <span className="text-gray-400 text-sm">
+                        ({s.product?.sku})
+                      </span>
+                    </td>
+                    <td className="p-3">{s.warehouse?.name}</td>
+                    <td className="p-3 font-bold text-blue-600">{s.quantity}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Table Requests */}
-      <div className="bg-white p-6 rounded shadow">
+      <div className="bg-white p-4 sm:p-6 rounded shadow overflow-hidden">
         <h2 className="text-xl font-bold mb-4">📝 Purchase Requests</h2>
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-100 border-b">
-            <tr>
-              <th className="p-3">Reference</th>
-              <th className="p-3">Vendor</th>
-              <th className="p-3 text-center">Total Qty</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Date</th>
-              <th className="p-3 text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.length === 0 ? (
+        
+        {/* WRAPPER SCROLL HORIZONTAL (Solusi Masalah Offset) */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse whitespace-nowrap">
+            <thead className="bg-gray-100 border-b">
               <tr>
-                <td colSpan="6" className="p-4 text-center text-gray-500">
-                  No requests found.
-                </td>
+                <th className="p-3">Reference</th>
+                <th className="p-3">Vendor</th>
+                <th className="p-3 text-center">Total Qty</th>
+                <th className="p-3">Status</th>
+                <th className="p-3">Date</th>
+                <th className="p-3 text-right">Action</th>
               </tr>
-            ) : (
-              requests.map((pr) => (
-                <tr
-                  key={pr.id}
-                  // Klik baris untuk navigasi ke halaman detail.
-                  onClick={() => router.push(`/edit/${pr.id}`)}
-                  className="border-b hover:bg-blue-50 cursor-pointer transition-colors duration-200"
-                >
-                  <td className="p-3 font-mono text-sm font-medium text-blue-600">
-                    {pr.reference}
-                  </td>
-
-                  <td className="p-3 text-sm text-gray-600">
-                    PT FOOM LAB GLOBAL
-                  </td>
-
-                  <td className="p-3 font-bold text-center text-gray-700">
-                    {pr.items?.reduce((sum, item) => sum + item.quantity, 0) ||
-                      0}
-                  </td>
-
-                  <td className="p-3">
-                    <StatusBadge status={pr.status} />
-                  </td>
-
-                  <td className="p-3 text-sm text-gray-500">
-                    {new Date(pr.created_at).toLocaleDateString()}
-                  </td>
-
-                  <td className="p-3 text-right">
-                    <span className="text-blue-600 text-sm font-semibold hover:underline">
-                      View &rarr;
-                    </span>
+            </thead>
+            <tbody>
+              {requests.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="p-4 text-center text-gray-500">
+                    No requests found.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                requests.map((pr) => (
+                  <tr
+                    key={pr.id}
+                    // Klik baris untuk navigasi ke halaman detail.
+                    onClick={() => router.push(`/edit/${pr.id}`)}
+                    className="border-b hover:bg-blue-50 cursor-pointer transition-colors duration-200"
+                  >
+                    {/* Reference ditampilkan FULL (tidak dipotong) */}
+                    <td className="p-3 font-mono text-sm font-medium text-blue-600">
+                      {pr.reference}
+                    </td>
+
+                    <td className="p-3 text-sm text-gray-600">
+                      PT FOOM LAB GLOBAL
+                    </td>
+
+                    <td className="p-3 font-bold text-center text-gray-700">
+                      {pr.items?.reduce((sum, item) => sum + item.quantity, 0) ||
+                        0}
+                    </td>
+
+                    <td className="p-3">
+                      <StatusBadge status={pr.status} />
+                    </td>
+
+                    <td className="p-3 text-sm text-gray-500">
+                      {new Date(pr.created_at).toLocaleDateString()}
+                    </td>
+
+                    <td className="p-3 text-right">
+                      <span className="text-blue-600 text-sm font-semibold hover:underline">
+                        View &rarr;
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
